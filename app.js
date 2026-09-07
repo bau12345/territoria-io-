@@ -87,4 +87,42 @@ const logoutButton = document.getElementById("logoutButton");
 if (logoutButton) logoutButton.addEventListener("click", async () => {
   await supabaseClient.auth.signOut();
   window.location.replace("index.html");
+const rewardsData = [
+  { id: 1, brand: "Café Martínez", title: "1 Café Espresso Gratis", cost: 500, icon: "☕" },
+  { id: 2, brand: "Open 25", title: "20% Desc. en Golosinas", cost: 300, icon: "🍬" },
+  { id: 3, brand: "Sportline", title: "15% Desc. en Zapatillas", cost: 2000, icon: "👟" },
+  { id: 4, brand: "YPF Punto Gourmet", title: "1 Licuado 2x1", cost: 800, icon: "🥤" }
+];
+
+let currentMeters = 1500;
+
+function toggleShop() {
+  const modal = document.getElementById('shop-modal');
+  modal.classList.toggle('hidden');
+  if (!modal.classList.contains('hidden')) renderRewards();
+}
+
+function renderRewards() {
+  document.getElementById('user-meters').innerText = currentMeters;
+  document.getElementById('modal-meters').innerText = currentMeters;
+  const container = document.getElementById('rewards-grid');
+  container.innerHTML = rewardsData.map(item => `
+    <div class="reward-card">
+      <div><span>${item.icon}</span><h4>${item.brand}</h4><p>${item.title}</p></div>
+      <p><strong>${item.cost} m</strong></p>
+      <button onclick="redeem(${item.id})" ${currentMeters < item.cost ? 'disabled' : ''}>
+        ${currentMeters >= item.cost ? 'Canjear' : 'Faltan metros'}
+      </button>
+    </div>
+  `).join('');
+}
+
+function redeem(id) {
+  const item = rewardsData.find(r => r.id === id);
+  if (currentMeters >= item.cost) {
+    currentMeters -= item.cost;
+    alert(`¡Canje exitoso! Presentá el código TERR-${Math.floor(1000 + Math.random() * 9000)} en ${item.brand}.`);
+    renderRewards();
+  }
+}
 });
